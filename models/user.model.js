@@ -27,14 +27,40 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			
 		},
+		bankname: {
+			type: String,
+			
+		},
+		accountnumber: {
+			type: String,
+			
+		},
+		ifsccode: {
+			type: String,
+			
+		},
+		verifiedname: {
+			type: String,
+			
+		},
+		upiid: {
+			type: String,
+			
+		},
 		mobile: {
 			type: String,
 			required: true,
 		},
+		referral: {
+			type: String,
+			
+		},
+
 		lastLogin: {
 			type: Date,
 			default: Date.now,
 		},
+
 		isVerified: {
 			type: Boolean,
 			default: false,
@@ -48,3 +74,4 @@ const userSchema = new mongoose.Schema(
 );
 
 export const User = mongoose.model("User", userSchema);
+

@@ -8,6 +8,7 @@ import {
 	resetPassword,
 	checkAuth,
 	updateInfo,
+	getInfo,
 } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -17,7 +18,8 @@ router.get("/check-auth", verifyToken, checkAuth);
 
 
 router.post("/signup", signup);
-router.put("/signup/:id",updateInfo)
+router.get("/signup",getInfo);
+router.put("/signup/:id",updateInfo);
 
 router.post("/login", login);
 router.post("/logout", logout);

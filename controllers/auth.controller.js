@@ -11,7 +11,7 @@ import {
 import { User } from "../models/user.model.js";
 
 export const signup = async (req, res) => {
-	const { email, password, name, mobile } = req.body;
+	const { email, password, name, mobile,referral,telegram,instagram,whatsapp,bankname,accountnumber,ifsccode,verifiedname,upiid } = req.body;
 
 	try {
 		if (!email || !password || !name ||!mobile) {
@@ -33,7 +33,16 @@ export const signup = async (req, res) => {
 			password: hashedPassword,
 			name,
 			mobile,
+			telegram,
+			instagram,
+			whatsapp,
+			bankname,
+			accountnumber,
+			ifsccode,
+			verifiedname,
+			upiid,
 			verificationToken,
+			referral,
 			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
 		});
 
@@ -41,6 +50,7 @@ export const signup = async (req, res) => {
 
 		// jwt
 		generateTokenAndSetCookie(res, user._id);
+		
 
 		await sendVerificationEmail(user.email, verificationToken);
 
@@ -76,6 +86,15 @@ export const updateInfo = async (req,res) => {
 	res.status(500).json({msg: error.message})
    }
 }
+export const getInfo = async (req,res)=>{
+	
+	try {
+        const Users = await User.find();
+        res.json(Users);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
 
 export const verifyEmail = async (req, res) => {
 	const { code } = req.body;
@@ -94,7 +113,7 @@ export const verifyEmail = async (req, res) => {
 		user.verificationTokenExpiresAt = undefined;
 		await user.save();
 
-		await sendWelcomeEmail(user.email, user.name);
+	
 
 		res.status(200).json({
 			success: true,
