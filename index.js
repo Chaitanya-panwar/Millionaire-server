@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 5000;
 
 
 
-app.use(cors({ origin: ["http://localhost:5173","http://localhost:5174"] , credentials: true }));
+app.use(cors({ origin: ["https://millionaire-club.onrender.com","http://localhost:5174"] , credentials: true }));
 
 app.use(express.json()); // allows us to parse incoming requests:req.body
 app.use(cookieParser()); // allows us to parse incoming cookies
