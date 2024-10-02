@@ -9,6 +9,14 @@ import {
 	checkAuth,
 	updateInfo,
 	getInfo,
+	addfund,
+	getFund,
+	addwithdrawal,
+	getWithdrawal,
+	deleteFund,
+	deleteWithdrawal,
+	updateFund,
+	updateWithdrawal,
 } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 
@@ -28,5 +36,16 @@ router.post("/verify-email", verifyEmail);
 router.post("/forgot-password", forgotPassword);
 
 router.post("/reset-password/:token", resetPassword);
+
+router.post("/fund",addfund);
+router.get("/fund",getFund);
+router.put("/fund/:id",updateFund);
+router.delete("/fund/:id",deleteFund);
+
+router.post("/withdrawal",addwithdrawal);
+router.get("/withdrawal",getWithdrawal);
+router.put("/withdrawal/:id",updateWithdrawal);
+router.delete("/withdrawal/:id",deleteWithdrawal);
+
 
 export default router;

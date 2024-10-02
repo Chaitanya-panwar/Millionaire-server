@@ -9,9 +9,11 @@ import {
 	sendWelcomeEmail,
 } from "../mailtrap/emails.js";
 import { User } from "../models/user.model.js";
+import { Fund } from "../models/fund.model.js";
+import { Withdrawal } from "../models/withdrawal.model.js";
 
 export const signup = async (req, res) => {
-	const { email, password, name, mobile,referral,telegram,instagram,whatsapp,bankname,accountnumber,ifsccode,verifiedname,upiid } = req.body;
+	const { email, password, name, mobile,referral,telegram,instagram,whatsapp,bankname,accountnumber,ifsccode,verifiedname,upiid,balance,myreferral,referralincome,totalbalance,dailyincome } = req.body;
 
 	try {
 		if (!email || !password || !name ||!mobile) {
@@ -43,6 +45,11 @@ export const signup = async (req, res) => {
 			upiid,
 			verificationToken,
 			referral,
+			balance,
+			myreferral,
+			referralincome,
+			totalbalance,
+			dailyincome,
 			verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
 		});
 
@@ -67,6 +74,88 @@ export const signup = async (req, res) => {
 	}
 };
 
+
+export const addfund = async (req, res) => {
+	const { email, amount, name, mobile,transactionid,balance,status,bankname,accountnumber,mainupi,referral } = req.body;
+	try {
+		const fund = new Fund({
+			email,
+			name,
+			mobile,
+			transactionid,
+			amount,
+			balance,
+			bankname,
+			accountnumber,
+            mainupi,
+			status,
+			referral
+		});
+		await fund.save();
+		res.status(201).json({
+			success: true,
+			message: "Add fund successfully",
+			user: {
+				...fund._doc,
+				password: undefined,
+			},
+		});
+	} catch (error) {
+		res.status(400).json({ success: false, message: error.message });
+	}
+};
+
+export const addwithdrawal = async (req,res) =>{
+   const {email,amount,name,mobile,upiid,balance,status,bankname,accountnumber,mainupi} = req.body;
+   try{
+	  const withdrawal = new Withdrawal({
+		  email,
+		  name,
+		  mobile,
+		  upiid,
+		  amount,
+		  balance,
+		  status,
+		  bankname,
+		  accountnumber,
+		  mainupi
+	  });
+	  await withdrawal.save();
+	  res.status(201).json({
+		success: true,
+		message: "Add withdrawal successfully",
+			user: {
+				...withdrawal._doc,
+				password: undefined,
+			},
+	  });
+   } catch (error) {
+	res.status(400).json({success: false, message: error.message});
+   }
+
+}
+
+export const getFund = async (req,res)=>{
+	
+	try {
+        const Funds = await Fund.find();
+		
+        res.json(Funds);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+export const getWithdrawal = async (req,res) =>{
+	try {
+		const withdrawal = await Withdrawal.find();
+
+		res.json(withdrawal);
+	} catch(err) {
+		res.status(500).send(err);
+	}
+}
+
 export const updateInfo = async (req,res) => {
    try{
 	  const { id } = req.params
@@ -85,11 +174,78 @@ export const updateInfo = async (req,res) => {
    catch (error){
 	res.status(500).json({msg: error.message})
    }
+
+}
+
+export const deleteFund = async (req,res) =>{
+   
+	try{
+		const {id} = req.params
+		const fund = await Fund.findByIdAndDelete(id)
+		res.status(200).json(fund)
+	}  catch (error){
+		res.status(500).json({msg: error.message})
+	   }
+	
+}
+
+export const updateFund = async (req,res) => {
+	try{
+	   const { id } = req.params
+	   const fund = await Fund.findByIdAndUpdate(
+		 {_id:id}, req.body, {
+			 new: true,
+			 runValidators: true,
+		 }
+	   );
+ 
+	   if (!fund) {
+		 return res.status(400).json({ success: false, message: "Fund doesn't Exist" });
+	 }
+	   res.status(200).json(fund)
+	}
+	catch (error){
+	 res.status(500).json({msg: error.message})
+	}
+ 
+ }
+export const updateWithdrawal = async (req,res) => {
+	try{
+	   const { id } = req.params
+	   const withdrawal = await Withdrawal.findByIdAndUpdate(
+		 {_id:id}, req.body, {
+			 new: true,
+			 runValidators: true,
+		 }
+	   );
+ 
+	   if (!withdrawal) {
+		 return res.status(400).json({ success: false, message: "Fund doesn't Exist" });
+	 }
+	   res.status(200).json(withdrawal)
+	}
+	catch (error){
+	 res.status(500).json({msg: error.message})
+	}
+ 
+ }
+
+export const deleteWithdrawal = async (req,res) =>{
+   
+	try{
+		const {id} = req.params
+		const withdrawal = await Withdrawal.findByIdAndDelete(id)
+		res.status(200).json(withdrawal)
+	}  catch (error){
+		res.status(500).json({msg: error.message})
+	   }
+	
 }
 export const getInfo = async (req,res)=>{
 	
 	try {
         const Users = await User.find();
+		
         res.json(Users);
     } catch (err) {
         res.status(500).send(err);
@@ -175,7 +331,7 @@ export const forgotPassword = async (req, res) => {
 		}
 
 		// Generate reset token
-		const resetToken = crypto.randomBytes(20).toString("hex");
+		const resetToken = crypto.randomBytes(20).toString("hex");             
 		const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; // 1 hour
 
 		user.resetPasswordToken = resetToken;
